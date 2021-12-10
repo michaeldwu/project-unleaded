@@ -26,4 +26,5 @@
 "0",""
 "0",""
 "0","view(merged_df)"
+"0","write.csv(x=merged_df, file=""final_clean_data/final_withscores.csv"")"
 "0",""

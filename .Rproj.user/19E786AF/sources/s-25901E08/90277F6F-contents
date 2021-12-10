@@ -33,6 +33,7 @@ merged_df <- merged_df[order(merged_df$score, decreasing = TRUE), ]
 
 
 view(merged_df)
+write.csv(x=merged_df, file="final_clean_data/final_withscores.csv")
 
 ```
 
