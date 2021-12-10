@@ -1,0 +1,112 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(readxl)
+library(readr)
+library(dplyr)
+library(tidyverse)
+library(janitor)
+
+```
+
+
+
+```{r}
+race <- read_csv("race_data/race_data2.csv") %>%
+  clean_names()
+
+race <- race[race$year == 10, ] 
+race <- race[race$agegrp == 0, ] 
+
+race <- race %>%
+  add_column(wa_tot = race$nhwa_male + race$nhwa_female)
+
+race <- race %>%
+  add_column(non_wa_percentage = 1 -race$wa_tot/race$tot_pop)
+
+
+race$state <-  sprintf("%02d", race$state)
+race$county <-  sprintf("%03d", race$county)
+race$id <- paste('0500000US', race$state, race$county, sep = '')
+
+
+
+race <- race %>%
+  select(id, stname, ctyname, tot_pop, non_wa_percentage)
+
+race$county <- paste(race$ctyname, race$stname, sep = ', ')
+
+race <- race %>%
+  select(id, county, tot_pop, non_wa_percentage)
+
+view(race)
+
+write.csv(x=race, file="race_data/race_data_cleaned.csv")
+write.csv(x=race, file="final_clean_data/race_data_cleaned.csv")
+
+```
+
+
+
+```{r}
+lead <- read_excel("lead_data/WV_CountyLevelSummary_2017.xlsx", skip = 2) %>%
+  clean_names()
+
+lead <- lead[-1,]
+
+lead <- lead  %>%
+  rename(total_children = total_population_of_children_72_months_of_age) %>%
+  rename(tested_children = number_of_children_tested_72_months_of_age) %>%
+  rename(percentage_tested = percentage_of_children_tested_72_months_of_age) %>%
+  rename(five_mg = children_with_confirmed_bl_ls_5_mg_d_l) %>%
+  rename(ten_mg = children_with_confirmed_bl_ls_10_mg_d_l) %>%
+  rename(five_mg_percentage = x7) %>%
+  rename(ten_mg_percentage = x9) %>%
+  select(county_fips, county_name, total_children, tested_children, percentage_tested, five_mg, ten_mg, five_mg_percentage, ten_mg_percentage)
+
+
+lead <- lead %>% 
+  add_column(state_fips = "0500000US54")
+
+lead$id <- paste(lead$state_fips, lead$county_fips, sep = '')
+  
+lead = subset(lead, select = -c(state_fips,county_fips) )
+
+n<-dim(lead)[1]
+lead<-lead[1:(n-5),]
+view(lead)
+write.csv(x=lead, file="lead_data_cleaned/westvirginia.csv")
+```
+
+```{r}
+lead <- read_csv("lead_data_cleaned/wisconsin.csv")
+lead <- transform(lead, tested_children = as.numeric(tested_children)) %>%
+  transform(lead, five_mg = as.numeric(five_mg)) %>%
+  transform(lead, ten_mg = as.numeric(ten_mg)) %>%
+  transform(lead, percentage_tested = as.numeric(percentage_tested)) %>%
+  transform(lead, five_mg_percentage = as.numeric(five_mg_percentage)) %>%
+  transform(lead, ten_mg_percentage = as.numeric(ten_mg_percentage)) %>%
+  select(id, county_name, total_children, tested_children, percentage_tested, five_mg, ten_mg, five_mg_percentage, ten_mg_percentage)
+view(lead)
+write.csv(x=lead, file="lead_data_cleaned/wisconsin.csv")
+```
+
+
+```{r}
+
+files <- list.files(path = "lead_data_cleaned/", pattern = "*.csv", full.names = T)
+
+df.list <- lapply(files, read_csv)
+df <- bind_rows(df.list, .id = "new")
+
+
+df <- df %>%
+  select(id, county_name, total_children, tested_children, percentage_tested, five_mg, ten_mg, five_mg_percentage, ten_mg_percentage)
+
+view(df)
+
+write.csv(x=df, file="final_clean_data/lead_data_cleaned.csv")
+```

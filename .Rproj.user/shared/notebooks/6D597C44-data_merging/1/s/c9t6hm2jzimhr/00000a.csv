@@ -1,0 +1,55 @@
+"0","race_df <- read_csv(""final_clean_data/race_data_cleaned.csv"")"
+"2","New names:
+* `` -> ...1
+"
+"2","[1mRows: [22m[34m3142[39m [1mColumns: [22m[34m5[39m
+"
+"2","[36m──[39m [1mColumn specification[22m [36m────────────────────────────────────────────────────────────────────────────────────[39m
+[1mDelimiter:[22m "",""
+[31mchr[39m (2): id, county
+[32mdbl[39m (3): ...1, tot_pop, non_wa_percentage
+"
+"2","
+[36mℹ[39m Use [38;5;235m[48;5;253m[38;5;235m[48;5;253m`spec()`[48;5;253m[38;5;235m[49m[39m to retrieve the full column specification for this data.
+[36mℹ[39m Specify the column types or set [38;5;235m[48;5;253m[38;5;235m[48;5;253m`show_col_types = FALSE`[48;5;253m[38;5;235m[49m[39m to quiet this message.
+"
+"0","lead_df <- read_csv(""final_clean_data/lead_data_cleaned.csv"")"
+"2","New names:
+* `` -> ...1
+"
+"2","[1mRows: [22m[34m2108[39m [1mColumns: [22m[34m10[39m
+"
+"2","[36m──[39m [1mColumn specification[22m [36m────────────────────────────────────────────────────────────────────────────────────[39m
+[1mDelimiter:[22m "",""
+[31mchr[39m (2): id, county_name
+[32mdbl[39m (8): ...1, total_children, tested_children, percentage_tested, five_mg, ten_mg, five_mg_percentage, ...
+"
+"2","
+[36mℹ[39m Use [38;5;235m[48;5;253m[38;5;235m[48;5;253m`spec()`[48;5;253m[38;5;235m[49m[39m to retrieve the full column specification for this data.
+[36mℹ[39m Specify the column types or set [38;5;235m[48;5;253m[38;5;235m[48;5;253m`show_col_types = FALSE`[48;5;253m[38;5;235m[49m[39m to quiet this message.
+"
+"0","income_df <- read_csv(""final_clean_data/income_data.csv"", skip = 1)"
+"2","[1mRows: [22m[34m840[39m [1mColumns: [22m[34m5[39m
+"
+"2","[36m──[39m [1mColumn specification[22m [36m────────────────────────────────────────────────────────────────────────────────────[39m
+[1mDelimiter:[22m "",""
+[31mchr[39m (2): id, county_name
+[32mdbl[39m (3): num_HH, median_HH_income, mean_HH_income
+"
+"2","
+[36mℹ[39m Use [38;5;235m[48;5;253m[38;5;235m[48;5;253m`spec()`[48;5;253m[38;5;235m[49m[39m to retrieve the full column specification for this data.
+[36mℹ[39m Specify the column types or set [38;5;235m[48;5;253m[38;5;235m[48;5;253m`show_col_types = FALSE`[48;5;253m[38;5;235m[49m[39m to quiet this message.
+"
+"0","race_income_df <- merge(race_df,income_df,by='id')"
+"0","view(race_income_df)"
+"0","race_income_df <- race_income_df %>%"
+"0","  select(id, county, non_wa_percentage, tot_pop, num_HH, median_HH_income)"
+"0",""
+"0",""
+"0","merged_df <- merge(race_income_df,lead_df,by='id')"
+"0","merged_df <- merged_df %>%"
+"0","  select(id, county, non_wa_percentage, tot_pop, num_HH, median_HH_income, five_mg_percentage, ten_mg_percentage)"
+"0",""
+"0","view(merged_df)"
+"0",""
+"0","write.csv(x=merged_df, file=""final_clean_data/final_merged.csv"")"

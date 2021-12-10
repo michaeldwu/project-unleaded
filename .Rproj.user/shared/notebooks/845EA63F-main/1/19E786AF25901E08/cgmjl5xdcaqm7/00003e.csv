@@ -1,0 +1,34 @@
+"0","lead <- read_excel(""lead_data/WV_CountyLevelSummary_2017.xlsx"", skip = 2) %>%"
+"0","  clean_names()"
+"2","New names:
+* `` -> ...7
+* `` -> ...9
+* `` -> ...11
+* `` -> ...12
+* `` -> ...13
+* ...
+"
+"0","lead <- lead[-1,]"
+"0",""
+"0","lead <- lead  %>%"
+"0","  rename(total_children = total_population_of_children_72_months_of_age) %>%"
+"0","  rename(tested_children = number_of_children_tested_72_months_of_age) %>%"
+"0","  rename(percentage_tested = percentage_of_children_tested_72_months_of_age) %>%"
+"0","  rename(five_mg = children_with_confirmed_bl_ls_5_mg_d_l) %>%"
+"0","  rename(ten_mg = children_with_confirmed_bl_ls_10_mg_d_l) %>%"
+"0","  rename(five_mg_percentage = x7) %>%"
+"0","  rename(ten_mg_percentage = x9) %>%"
+"0","  select(county_fips, county_name, total_children, tested_children, percentage_tested, five_mg, ten_mg, five_mg_percentage, ten_mg_percentage)"
+"0",""
+"0",""
+"0","lead <- lead %>% "
+"0","  add_column(state_fips = ""0500000US54"")"
+"0",""
+"0","lead$id <- paste(lead$state_fips, lead$county_fips, sep = '')"
+"0","  "
+"0","lead = subset(lead, select = -c(state_fips,county_fips) )"
+"0",""
+"0","n<-dim(lead)[1]"
+"0","lead<-lead[1:(n-5),]"
+"0","view(lead)"
+"0","write.csv(x=lead, file=""lead_data_cleaned/westvirginia.csv"")"

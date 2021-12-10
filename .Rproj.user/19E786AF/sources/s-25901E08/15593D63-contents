@@ -1,0 +1,35 @@
+---
+title: "data_merging"
+author: "Michael Wu"
+date: "12/9/2021"
+output: html_document
+---
+
+```{r}
+library(readxl)
+library(readr)
+library(dplyr)
+library(tidyverse)
+library(janitor)
+
+```
+
+```{r}
+race_df <- read_csv("final_clean_data/race_data_cleaned.csv")
+lead_df <- read_csv("final_clean_data/lead_data_cleaned.csv")
+income_df <- read_csv("final_clean_data/income_data.csv", skip = 1)
+
+race_income_df <- merge(race_df,income_df,by='id')
+view(race_income_df)
+race_income_df <- race_income_df %>%
+  select(id, county, non_wa_percentage, tot_pop, num_HH, median_HH_income)
+
+
+merged_df <- merge(race_income_df,lead_df,by='id')
+merged_df <- merged_df %>%
+  select(id, county, non_wa_percentage, tot_pop, num_HH, median_HH_income, five_mg_percentage, ten_mg_percentage)
+
+view(merged_df)
+
+write.csv(x=merged_df, file="final_clean_data/final_merged.csv")
+```

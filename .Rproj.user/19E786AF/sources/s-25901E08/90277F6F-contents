@@ -1,0 +1,70 @@
+---
+title: "data_analysis"
+author: "Michael Wu"
+date: "12/9/2021"
+output: html_document
+---
+
+```{r}
+library(readxl)
+library(readr)
+library(dplyr)
+library(tidyverse)
+library(janitor)
+library(gt)
+library(webshot)
+
+```
+
+
+```{r}
+merged_df <- read_csv("final_clean_data/final_merged.csv")  %>%
+  select(id, county, non_wa_percentage, tot_pop, median_HH_income, five_mg_percentage, ten_mg_percentage)
+
+merged_df[is.na(merged_df)] <- 0
+
+# Metric Formula: (5mg + 10mg * 2) * (67500/median_HH_income) * sqrt(non_wa_percentage/0.422)
+# Non-WA Percentage Source: https://www.census.gov/library/stories/2021/08/2020-united-states-population-more-racially-ethnically-diverse-than-2010.html
+# Median Income Source: https://www.census.gov/library/publications/2021/demo/p60-273.html
+merged_df <- merged_df %>%
+  add_column(score = (merged_df$five_mg_percentage + merged_df$ten_mg_percentage * 2) * (67500/merged_df$median_HH_income) * sqrt(merged_df$non_wa_percentage/0.422) )
+
+merged_df <- merged_df[order(merged_df$score, decreasing = TRUE), ]
+
+
+view(merged_df)
+
+```
+
+```{r}
+tbl <- merged_df %>%
+  select(county, tot_pop, non_wa_percentage, median_HH_income, five_mg_percentage, ten_mg_percentage, score) %>%
+  head(5) %>%
+  gt() %>%
+  cols_label(
+    county = "County Name",
+    tot_pop = "Population",
+    non_wa_percentage = "Non-White %",
+    median_HH_income = "Median Income",
+    five_mg_percentage = "5mg % Exposure",
+    ten_mg_percentage = "10mg % Exposure",
+    score = "μ Score"
+  )  %>%
+  fmt_currency(
+    columns = median_HH_income,
+    currency = "USD"
+  ) %>%
+  tab_header(
+    title = md("Project Unleaded: The Five Counties in the US with the Worst Lead Exposure"),
+    subtitle = "Data from the CDC and the 2020 Census"
+  ) %>%
+  tab_source_note(md("μ score calculated by weighing county's relative median income, 5mg exposure, 10mg, exposure, and non-white population percentage."))
+ 
+tbl
+
+tbl %>%
+  gtsave(
+    "unleaded_1.png"
+  )
+
+```
